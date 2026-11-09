@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Prompt Generator | 4 Tipe Asesmen</title>
+<style>
+:root{--navy:#172554;--blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#8b5cf6;--bg:#f6f8fc}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:#172033}
+header{background:linear-gradient(135deg,#172554,#253b75);color:white;padding:28px 20px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(24px,4vw,38px)} header p{margin:0;opacity:.88}
+.container{max-width:1150px;margin:28px auto;padding:0 18px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:22px;align-items:start}
+.panel{background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 30px #17255412}
+h2{font-size:20px;margin:0 0 16px;color:var(--navy)}
+.types{display:grid;gap:12px}.type{border:2px solid #e6eaf2;border-radius:14px;padding:14px;cursor:pointer;transition:.2s}
+.type:hover{transform:translateY(-2px)}.type.active{box-shadow:0 5px 16px #0001}
+.type b{display:block;font-size:16px;margin-bottom:5px}.type small{color:#667085;line-height:1.4}
+.open.active{border-color:var(--blue);background:#eff6ff}.closed.active{border-color:var(--green);background:#f0fdf4}.direct.active{border-color:var(--orange);background:#fffbeb}.indirect.active{border-color:var(--purple);background:#f5f3ff}
+label{display:block;font-weight:700;font-size:13px;margin:15px 0 7px}
+input,textarea,select{width:100%;border:1px solid #d8deea;border-radius:10px;padding:11px;font:inherit;background:white}
+textarea{min-height:82px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer}
+.primary{background:var(--navy);color:#fff;width:100%;margin-top:18px}.secondary{background:#edf1f7;color:#172033;margin-top:10px;width:100%}
+.badge{display:inline-block;background:#eef2ff;color:#4338ca;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px}
+.output{min-height:470px;white-space:pre-wrap;line-height:1.6;background:#0f172a;color:#e5edf8;border-radius:14px;padding:20px;font-family:ui-monospace,Consolas,monospace;font-size:13px;overflow:auto}
+.actions{display:flex;gap:10px;margin-top:12px}.actions button{flex:1}.note{margin-top:16px;background:#eef6ff;border-left:4px solid var(--blue);padding:12px;border-radius:8px;font-size:13px;color:#40516d}
+footer{text-align:center;color:#667085;font-size:12px;padding:24px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.output{min-height:380px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Exam Prompt Generator</h1>
+<p>Generator prompt soal berdasarkan 4 tipe asesmen</p>
+</header>
+
+<div class="container">
+<div class="grid">
+<section class="panel">
+<h2>1. Pilih Tipe Asesmen</h2>
+<div class="types">
+<div class="type open active" data-type="open" onclick="selectType('open')">
+<b>💡 Asesmen Terbuka (Open Ended)</b><small>Esai, uraian panjang, proyek, atau tulisan kreatif.</small></div>
+<div class="type closed" data-type="closed" onclick="selectType('closed')">
+<b>☑️ Asesmen Tertutup (Close Ended)</b><small>Pilihan ganda, benar/salah, isian, menjodohkan.</small></div>
+<div class="type direct" data-type="direct" onclick="selectType('direct')">
+<b>📝 Asesmen Langsung (Direct)</b><small>Tes praktik, unjuk kerja, observasi, demonstrasi.</small></div>
+<div class="type indirect" data-type="indirect" onclick="selectType('indirect')">
+<b>💬 Asesmen Tidak Langsung (Indirect)</b><small>Skala penilaian, checklist, laporan, wawancara.</small></div>
+</div>
+
+<h2 style="margin-top:22px">2. Informasi Soal</h2>
+<label>Mata Pelajaran</label><input id="subject" placeholder="Contoh: Perawatan dan Perbaikan Permesinan Kapal">
+<label>Materi / Topik</label><input id="topic" placeholder="Contoh: Troubleshooting Sistem Pendingin Mesin Diesel">
+<div class="row">
+<div><label>Jenjang / Kelas</label><input id="grade" placeholder="Contoh: SMK Kelas XI"></div>
+<div><label>Jumlah Soal / Tugas</label><input id="count" type="number" min="1" value="5"></div>
+</div>
+<label>Tujuan Pembelajaran / Kompetensi</label><textarea id="objective" placeholder="Tuliskan kemampuan yang harus dikuasai siswa..."></textarea>
+<label>Konteks / Karakteristik Siswa (opsional)</label><textarea id="context" placeholder="Contoh: Pembelajaran vokasi, berorientasi pada kasus nyata di kapal..."></textarea>
+<button class="primary" onclick="generatePrompt()">✨ Generate Prompt Soal</button>
+<button class="secondary" onclick="resetForm()">↻ Reset Formulir</button>
+<div class="note">Tip: Pilih tipe asesmen sesuai tujuan pembelajaran dan bukti kompetensi yang ingin diukur.</div>
+</section>
+
+<section class="panel">
+<span class="badge" id="typeBadge">ASESMEN TERBUKA</span>
+<h2>Prompt Siap Digunakan</h2>
+<div class="output" id="output">Lengkapi informasi di sebelah kiri, lalu klik “Generate Prompt Soal”.</div>
+<div class="actions">
+<button class="secondary" onclick="copyPrompt()">📋 Salin Prompt</button>
+<button class="secondary" onclick="downloadPrompt()">⬇ Unduh .txt</button>
+</div>
+</section>
+</div>
+</div>
+<footer>Exam Prompt Generator • Mendukung perencanaan asesmen yang terarah dan kontekstual</footer>
+
+<script>
+let selected='open';
+const configs={
+open:{name:'ASESMEN TERBUKA',instruction:`Buat soal yang memungkinkan siswa memberikan jawaban terbuka, argumentatif, analitis, kreatif, atau berbasis pemecahan masalah. Sertakan stimulus/kasus kontekstual. Jawaban tidak dibatasi pada satu jawaban tunggal. Sertakan rubrik penilaian yang jelas.`},
+closed:{name:'ASESMEN TERTUTUP',instruction:`Buat soal dengan jawaban yang jelas dan dapat dinilai secara objektif. Pilih format soal yang paling sesuai, seperti pilihan ganda, benar/salah, isian singkat, atau menjodohkan. Sertakan kunci jawaban dan pembahasan singkat.`},
+direct:{name:'ASESMEN LANGSUNG',instruction:`Buat tugas asesmen yang mengukur kinerja nyata siswa melalui praktik, unjuk kerja, observasi, atau demonstrasi. Jelaskan skenario/tugas, langkah kerja, alat atau bahan bila relevan, indikator observasi, serta rubrik penilaian kinerja.`},
+indirect:{name:'ASESMEN TIDAK LANGSUNG',instruction:`Buat instrumen untuk mengukur kemampuan atau perilaku siswa melalui informasi tidak langsung, seperti checklist, skala penilaian, laporan pihak lain, atau wawancara. Sertakan indikator, format instrumen, skala penilaian, dan panduan interpretasi hasil.`}
+};
+function selectType(type){
+selected=type;
+document.querySelectorAll('.type').forEach(x=>x.classList.remove('active'));
+document.querySelector(`.${type}`).classList.add('active');
+document.getElementById('typeBadge').textContent=configs[type].name;
+}
+function val(id, fallback='belum diisi'){return document.getElementById(id).value.trim()||fallback}
+function generatePrompt(){
+const subject=val('subject'),topic=val('topic'),grade=val('grade'),count=val('count','5');
+const objective=val('objective'),context=document.getElementById('context').value.trim();
+const c=configs[selected];
+const prompt=`Bertindaklah sebagai ahli asesmen pendidikan dan guru profesional.
+
+TUGAS:
+Rancang ${count} soal/tugas asesmen berkualitas berdasarkan tipe ${c.name}.
+
+INFORMASI PEMBELAJARAN:
+- Mata pelajaran: ${subject}
+- Materi/topik: ${topic}
+- Jenjang/kelas: ${grade}
+- Tujuan pembelajaran/kompetensi: ${objective}
+${context?`- Konteks/karakteristik siswa: ${context}`:''}
+
+KARAKTERISTIK ASESMEN:
+${c.instruction}
+
+PERSYARATAN KUALITAS:
+1. Gunakan bahasa Indonesia yang jelas, komunikatif, dan sesuai jenjang peserta didik.
+2. Pastikan setiap soal/tugas selaras dengan tujuan pembelajaran.
+3. Gunakan konteks autentik dan relevan, terutama bila materi bersifat vokasional atau praktik.
+4. Variasikan tingkat proses kognitif sesuai kebutuhan.
+5. Hindari pertanyaan yang ambigu.
+6. Sajikan hasil dalam format yang rapi dan siap digunakan guru.
+
+FORMAT OUTPUT:
+A. Identitas asesmen
+B. Tujuan asesmen
+C. Petunjuk pengerjaan
+D. Daftar soal/tugas
+E. Kunci jawaban atau pedoman penilaian (sesuai tipe asesmen)
+F. Rubrik/instrumen penilaian bila diperlukan
+
+Berikan hasil yang profesional, akademik, dan langsung dapat digunakan dalam kegiatan pembelajaran.`;
+document.getElementById('output').textContent=prompt;
+}
+function copyPrompt(){
+const text=document.getElementById('output').textContent;
+navigator.clipboard.writeText(text).then(()=>alert('Prompt berhasil disalin.'));
+}
+function downloadPrompt(){
+const text=document.getElementById('output').textContent;
+const blob=new Blob([text],{type:'text/plain'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='prompt-generator-asesmen.txt';a.click();URL.revokeObjectURL(a.href);
+}
+function resetForm(){document.querySelectorAll('input:not([type=number]),textarea').forEach(x=>x.value='');document.getElementById('count').value=5;document.getElementById('output').textContent='Lengkapi informasi di sebelah kiri, lalu klik “Generate Prompt Soal”.';selectType('open')}
+</script>
+</body>
+</html>
